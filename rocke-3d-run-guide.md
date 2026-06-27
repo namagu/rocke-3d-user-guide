@@ -1,4 +1,25 @@
+Hiiii this is my (very) un-edited guide to running ROCKE-3D on a high-performance computing (HPC) cluster. 
 
+A few me-specific things that you will have to change if you're doing this for yourself:
+  * I'm using HiperGator (hpg), which is the University of Florida HPC system, and ngl the [documentation](https://docs.rc.ufl.edu/) is not that great. Here's a [succint guide](https://jas000n.github.io/jekyll/2025-09-01-HiPerGator-Tutorial.html) from [Jas000n](https://github.com/Jas000n) that I've found useful. All the paths in my guide will be specific to the file structure for my research group's allocation in hpg.
+  * I made a `conda` environment called `rocky` but I don't remember what's in it. Probably python.
+
+Here are the official documentation bits from the NASA GISS folks for installing and running ROCKE-3D. 
+
+- [NASA GISS ROCKE-3D homepage](https://simplex.giss.nasa.gov/gcm/ROCKE-3D/)  
+- [ROCKE-3D 2024 Tutorial slides](https://simplex.giss.nasa.gov/gcm/ROCKE-3D/GISS_ROCKE-3D_tutorial_SLIDES_2024.pdf)  
+- [ROCKE-3D 2025 Tutorial video](https://www.youtube.com/watch?v=2hs17xiFEXc&list=PLpMmnV3HS7r3ryMbNOPynfSrZY4w7mHoB&index=18)  
+- [ROCKE-3D compiler installation (annotated by me)](https://docs.google.com/document/d/1xsPshwBE7r0rpkTiY51tNJ715gK7Aw39cyhzGMdowHs/edit?usp=sharing)  
+- [ROCKE-3D planet\_1.0 local computer installation instructions (annoted by me)](https://docs.google.com/document/d/1Sn8tqfrG6A7L_BKjF8qmAs50EA8bnC6yAe5cISzekIc/edit?usp=sharing)  
+- [ROCKE-3D cheat sheet (GISS)](https://docs.google.com/document/d/1iQDq0S5Ulqus6dbUUVVQQdP6k8P10vlMCuVqhn2sWpA/edit?usp=sharing)  
+- [ROCKE-3D GISS publications page](https://portal.nccs.nasa.gov/GISS_modelE/ROCKE-3D/publication-supplements/)  
+- [ROCKE-3D software paper](https://ui.adsabs.harvard.edu/abs/2017ApJS..231...12W/abstract)  
+- [Crash solutions (GISS)](https://docs.google.com/document/d/1Hvy9vW9m8YiN8_wf7SnulWIEcoXjgHT88C_o73-sbqw/view?tab=t.0)
+
+
+I really believe in sharing knowledge and alleviating code-induced suffering where possible, so if anything in here is opaque (or wrong, which is likely ngl), please _**let me know**_. If there's enough interest (like, more than two people basically who want it), I'm not opposed to starting a ROCKE-3D Discord or Tumblr or groupchat or whatever. 
+
+My email is natalia.guerrero (at) ufl (dot) edu
 
 # compiling a run
 
@@ -8,14 +29,10 @@ Search for `openmpi` and which one is being used: `module avail openmpi` (imo th
 
 - `ml conda`
 - `conda activate rocky`
-
-Making a brand new run bc fuck me ig.
   
 - `module load gcc`
-- `module load openmpi/5.0.7`
+- `module load openmpi/5.0.10`
 
-  
-  
   
 `make clean; make -j setup RUN=P1SoM40_Test` 
 
@@ -23,7 +40,7 @@ This whil take a while as `make -j setup` takes a while. It will probably throw 
 
 # editing a run
 
-We want to run Earth's rundeck for a *year*
+Let's say we want to run Earth's rundeck for a *year*
 
 rundeck: `E1oM20_Test.R`
 
@@ -49,7 +66,7 @@ Changing it so that the last line is:
 
 
 ## rundeck definitions
-According to the video, 
+According to the [video](https://youtu.be/2hs17xiFEXc?list=PLpMmnV3HS7r3ryMbNOPynfSrZY4w7mHoB&t=2756), 
 
 `DTsrc` **cannot** be changed during the run
 `DT`: dynamic timestep;  can be changed
@@ -74,14 +91,11 @@ According to the video, 
 `I`  file is a transcript of the run itself; doesn't contain comments, just the input files, the parameters, and the start/end dates; this is the file that's being read when you start/stop the run, **NOT** the rundeck; simplest to modify when wanting to extend the run, etc. without having to recompile (but why would you do that? wouldn't you want the rundeck to be as accurate as possible??)
 
 
-
 # running it
 
 These are the scripts for just running it. We need to be a little fancier on hpg.....so we have to embed the following commands into an `sbatch` script, `go_E1oM20_Test.sh` but 
 If you don't want to embed it in a script, you can just run it interactively:
 `srun --account=sarahballard --qos=sarahballard-b ../exec/runE E1oM20_Test -cold-restart -np 1`
-
-
 
 
 #### Using `go_E1oM20_Test.sh`
@@ -135,7 +149,7 @@ Run with `sbatch go_E1oM20_Test.sh` (can't just do `./go_E1oM20_Test.sh` because
 Check that it's running using `squeue -A sarahballard`
 
 
-From Kyle, adapted to our purposes:
+From Kyle Batra, adapted to our purposes:
 ![Screen Shot 2025-09-16 at 10.25.03 AM.png](:/a0b7bedd7c884a21a05f6f0303bb4374)
 
 
@@ -182,7 +196,7 @@ Go to local machine and rsync the files you want:
 `rsync -av --include="filepatterntoinclude" --exclude="*" username@rsync.rc.ufl.edu:/path/to/directory /path/to/local/directory` 
 
 ```
-cd /Users/natalia.guerrero/Dropbox/day-year/E1oM20_Test_nc
+cd /local/directory/here/E1oM20_Test_nc
 rsync -av --include="PARTIAL*nc" --exclude="*" natalia.guerrero@rsync.rc.ufl.edu:/blue/sarahballard/natalia.guerrero/modelE2_planet_1.0/decks/E1oM20_Test/ .
 ```
 
