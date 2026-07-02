@@ -159,16 +159,24 @@ These are the commands from the documentation, but we are figuring out how they 
 
 # handling the outputs
 
-check the `*.PRT` file: `tail -f [runID]/*.prt`
+Ok, go to the directory for the run, e.g. `/blue/sarahballard/natalia.guerrero/modelE2_planet_1.0/decks/E1oM20_Test
 
-`folder1` initial state of the model after reading in all the inputs but without running anything
-`folder2` model output, restart file after 2 timesteps
+check the `*.PRT` file: `tail -f [runID]/*.prt
+(it is big) 
 
-Ok, go to the directory for the run, e.g. `/blue/sarahballard/natalia.guerrero/modelE2_planet_1.0/decks/E1oM20_Test`
+The `monYear.zzzRUNID.nc` files, which will have all the simulated atmosphere and ocean data in them, are soft-linked here from where they live in `ModelE_Support/prod_decks/prod_runs/E1oM20_Test/` or similar.
+  * `zzz` : type of file, e.g. `acc` (monthly accumulated diagnostics)
+rsf:  big files for restart
 
-The `.nc` files, which will have all the simulated atmosphere and ocean data in them, are soft-linked here from where they live in `ModelE_Support/prod_decks/prod_runs/E1oM20_Test/` or similar.
+#### Utilities: 
+- `scaleacc` scales the accumulated files 
+- `sumfiles` makes time-averaged acc files 
+- `diffreport` compares netCDF files, e.g. comparing the output after using two different compilers
+- `ncview` basic Linux functionality to quickly see gridded model output 
+- `Panoply` viewing tool (GUI) 
 
-To extract these files, run the `netcdf` tool `scaleacc` with option `all`:
+
+To extract these files, run the netCDF tool `scaleacc` with option `all`:
 ```module purge
 module load gcc openmpi netcdf
 scaleacc PARTIAL.accE1oM20_Test.nc all 
@@ -177,7 +185,7 @@ scaleacc PARTIAL.accE1oM20_Test.nc all
 You might have to add stuff to the `$LD_LIBRARY_PATH`: `export LD_LIBRARY_PATH=/blue/sarahballard/natalia.guerrero/ModelE_Support/netcdf/lib/:$LD_LIBRARY_PATH`
 
 
-Running `scaleacc` will make a bunch of new files:
+Running `scaleacc [.nc file] [option, e.g. all]` will make a bunch of new files:
 ```
 PARTIAL.consrvE1oM20_Test.nc
 PARTIAL.adiurnE1oM20_Test.nc  PARTIAL.hdiurnE1oM20_Test.nc
@@ -190,6 +198,21 @@ PARTIAL.ajE1oM20_Test.nc      PARTIAL.ojlE1oM20_Test.nc
 PARTIAL.ajlE1oM20_Test.nc     PARTIAL.olnstE1oM20_Test.nc
 PARTIAL.aregE1oM20_Test.nc    PARTIAL.otjE1oM20_Test.nc
 ```
+
+General key to `zzz` segment of filename:
+
+`a` atmosphere
+`o` ocean
+
+`i` longitude
+`j` latitude
+`l` altitude
+
+`k` pressure
+`t` tracers
+`i` ice 
+
+(longer list of file types on slide 44-45 of [2024 Tutorial Slides](https://simplex.giss.nasa.gov/gcm/ROCKE-3D/GISS_ROCKE-3D_tutorial_SLIDES_2024.pdf))
 
 Go to local machine and rsync the files you want:
 
